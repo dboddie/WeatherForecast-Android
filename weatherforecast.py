@@ -21,12 +21,12 @@ from java.io import BufferedInputStream, FileNotFoundException, InputStream
 from java.lang import String
 from java.net import HttpURLConnection, URL
 from android.widget import TextView
-from org.xmlpull.v1 import XmlPullParser, XmlPullParserFactory
 from serpentine.activities import Activity
 
 from app_resources import R
 
 from exceptions import WeatherException
+from forecastparser import ForecastParser
 from widgets import ForecastWidget, LocationListener, LocationWidget
 
 class WeatherForecastActivity(Activity):
@@ -48,8 +48,9 @@ class WeatherForecastActivity(Activity):
     def locationEntered(self, location):
     
         stream = self.getSampleStream()
-        s = self.parseData(stream)
-        self.forecastWidget.addText(s)
+        parser = ForecastParser(stream)
+        for s in parser:
+            self.forecastWidget.addText(s)
         self.setContentView(self.forecastWidget)
     
     @args(InputStream, [])
@@ -75,28 +76,3 @@ class WeatherForecastActivity(Activity):
             raise WeatherException("Resource not found")
         
         return stream
-    
-    @args(String, [InputStream])
-    def parseData(self, stream):
-    
-        factory = XmlPullParserFactory.newInstance()
-        parser = factory.newPullParser()
-        parser.setInput(stream, None)
-        
-        eventType = parser.getEventType()
-        s = ""
-        
-        while eventType != XmlPullParser.END_DOCUMENT:
-        
-            if eventType == XmlPullParser.START_DOCUMENT:
-                s += "Start document\n"
-            elif eventType == XmlPullParser.START_TAG:
-                s += "Start tag: " + parser.getName() + "\n"
-            elif eventType == XmlPullParser.END_TAG:
-                s += "End tag: " + parser.getName() + "\n"
-            
-            eventType = parser.next()
-        
-        s += "End document"
-        
-        return s
