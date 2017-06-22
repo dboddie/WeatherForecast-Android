@@ -49,8 +49,10 @@ class WeatherForecastActivity(Activity):
     
         stream = self.getSampleStream()
         parser = ForecastParser(stream)
-        for s in parser:
-            self.forecastWidget.addText(s)
+        for obj in parser:
+            if obj.type == "text":
+                self.forecastWidget.addText(obj.value)
+        
         self.setContentView(self.forecastWidget)
     
     @args(InputStream, [])
