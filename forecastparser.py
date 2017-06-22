@@ -1,7 +1,15 @@
 from java.io import InputStream
 from java.lang import Iterable, Object, String
-from java.util import Iterator, NoSuchElementException
+from java.util import Iterator, Stack
 from org.xmlpull.v1 import XmlPullParser, XmlPullParserFactory
+
+class NameStack(Stack):
+
+    __item_types__ = [String]
+    
+    def __init__(self):
+        Stack.__init__(self)
+
 
 class ForecastParser(Object):
 
@@ -17,6 +25,8 @@ class ForecastParser(Object):
         self.parser = factory.newPullParser()
         self.parser.setInput(stream, None)
         
+        self.name_stack = NameStack()
+        
         self.eventType = self.parser.getEventType()
     
     @args(Iterator(String), [])
@@ -24,18 +34,22 @@ class ForecastParser(Object):
         return self
     
     def hasNext(self):
+    
         while self.eventType != XmlPullParser.END_DOCUMENT:
         
-            lastEventType = self.eventType
             self.eventType = self.parser.next()
             
-            if lastEventType == XmlPullParser.START_TAG:
+            if self.eventType == XmlPullParser.START_TAG:
+                self.name_stack.push(self.parser.getName())
                 return True
+            elif self.eventType == XmlPullParser.END_TAG:
+                self.name_stack.pop()
         
         return False
     
     def next(self):
-        return self.parser.getName()
+    
+        return self.name_stack.peek()
     
     def remove(self):
         pass
