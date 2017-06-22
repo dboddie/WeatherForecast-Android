@@ -25,7 +25,7 @@ app_name = "Weather Forecast"
 package_name = "uk.org.boddie.android.weatherforecast"
 res_files = {"drawable": {"ic_launcher": "icon.svg"},
              "raw": {"sample": "forecast.xml"}}
-code_file = "weatherforecast.py"
+code_file = "src/weatherforecast.py"
 include_paths = []
 layout = None
 features = []
