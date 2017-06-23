@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from java.io import BufferedInputStream, FileNotFoundException, InputStream
 from java.lang import String
 from java.net import HttpURLConnection, URL
-from android.widget import TextView
 from serpentine.activities import Activity
 
 from app_resources import R
@@ -47,13 +46,14 @@ class WeatherForecastActivity(Activity):
     
     def locationEntered(self, location):
     
-        stream = self.getSampleStream()
-        parser = ForecastParser(stream)
+        #stream = self.getSampleStream()
+        stream = self.fetchData("Norway/Oslo/Oslo/Oslo")
+        parser = ForecastParser(stream, self)
         for obj in parser:
-            if obj.type == "text":
-                self.forecastWidget.addText(obj.value)
+            self.forecastWidget.addChildView(obj)
         
         self.setContentView(self.forecastWidget)
+        stream.close()
     
     @args(InputStream, [])
     def getSampleStream(self):
@@ -64,7 +64,7 @@ class WeatherForecastActivity(Activity):
     @args(InputStream, [String])
     def fetchData(self, place):
     
-        url = URL("https://www.yr.no/place/david/www-repo/Personal/Updates/2016/images/duck-small.png")
+        url = URL("http://www.yr.no/place/" + place + "/forecast.xml")
         connection = CAST(url.openConnection(), HttpURLConnection)
         connection.setInstanceFollowRedirects(True)
         

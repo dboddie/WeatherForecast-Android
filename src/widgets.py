@@ -60,9 +60,7 @@ class ForecastWidget(ScrollView):
         self.vbox = VBox(context)
         self.addView(self.vbox)
     
-    @args(void, [String])
-    def addText(self, text):
+    @args(void, [View])
+    def addChildView(self, view):
     
-        label = TextView(self.getContext())
-        label.setText(text)
-        self.vbox.addView(label)
+        self.vbox.addView(view)
