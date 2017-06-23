@@ -19,9 +19,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from java.lang import String
 from android.content import Context
-from android.view import View
-from android.widget import Button, EditText, LinearLayout, ScrollView, TextView
-from serpentine.widgets import VBox
+from android.view import Gravity, View, ViewGroup
+from android.widget import Button, EditText, ImageView, LinearLayout, \
+                           ScrollView, Space, TextView
+from serpentine.widgets import HBox, VBox
+
+from forecastparser import Forecast
 
 class LocationListener:
 
@@ -60,7 +63,54 @@ class ForecastWidget(ScrollView):
         self.vbox = VBox(context)
         self.addView(self.vbox)
     
-    @args(void, [View])
-    def addChildView(self, view):
+    @args(void, [Forecast])
+    def addForecast(self, forecast):
     
-        self.vbox.addView(view)
+        context = self.getContext()
+        
+        # Date
+        dateView = TextView(context)
+        dateView.setText(forecast.from_.toString())
+        dateView.setGravity(Gravity.CENTER)
+        
+        # Symbol and description
+        symbolBox = VBox(context)
+        symbolBox.setGravity(Gravity.LEFT)
+        symbolBox.setBackgroundColor(0x80f08080)
+        
+        descView = TextView(context)
+        descView.setText(forecast.description)
+        symbolBox.addView(descView)
+        
+        if forecast.symbol != -1:
+            imageView = ImageView(context)
+            imageView.setImageResource(forecast.symbol)
+            symbolBox.addView(imageView)
+        
+        # Temperature and wind speed
+        tempBox = VBox(context)
+        tempBox.setGravity(Gravity.RIGHT)
+        tempBox.setBackgroundColor(0x8080f080)
+        
+        tempView = TextView(context)
+        tempView.setTextSize(tempView.getTextSize() * 2)
+        if forecast.temperatureUnit == "celsius":
+            tempView.setText(forecast.temperature + u"\u2103")
+        else:
+            tempView.setText(forecast.temperature + " " + forecast.temperatureUnit)
+        
+        windView = TextView(context)
+        windView.setText(forecast.windSpeed)
+        
+        tempBox.addView(windView)
+        tempBox.addView(tempView)
+        
+        # Arrange the two boxes.
+        hbox = HBox(context)
+        hbox.setBackgroundColor(0x80808080)
+        hbox.setHorizontalGravity(Gravity.CENTER_HORIZONTAL)
+        hbox.addView(symbolBox)
+        hbox.addView(tempBox)
+        
+        self.vbox.addView(dateView)
+        self.vbox.addView(hbox)

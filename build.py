@@ -110,7 +110,7 @@ res_files = {
         "s49": "images/49.svg",
         "s50": "images/50.svg"
         },
-    "raw": {"sample": "forecast.xml"}
+    "raw": {"sample": "oslo.xml"}
     }
 
 code_file = "src/weatherforecast.py"

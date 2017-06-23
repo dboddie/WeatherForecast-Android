@@ -46,11 +46,11 @@ class WeatherForecastActivity(Activity):
     
     def locationEntered(self, location):
     
-        #stream = self.getSampleStream()
-        stream = self.fetchData("Norway/Oslo/Oslo/Oslo")
-        parser = ForecastParser(stream, self)
-        for obj in parser:
-            self.forecastWidget.addChildView(obj)
+        stream = self.getSampleStream()
+        #stream = self.fetchData("Norway/Oslo/Oslo/Oslo")
+        objects = ForecastParser.parse(stream)
+        for obj in objects:
+            self.forecastWidget.addForecast(obj)
         
         self.setContentView(self.forecastWidget)
         stream.close()
