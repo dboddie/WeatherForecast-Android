@@ -17,10 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+from java.io import BufferedReader, File, FileNotFoundException, FileReader
 from java.lang import String
-from java.util import List
+from java.util import List, Map
 from android.content import Context
 from android.graphics import Color, Typeface
+from android.os import Environment
 from android.view import Gravity, View, ViewGroup
 from android.widget import AdapterView, Button, EditText, ImageView, \
     GridLayout, LinearLayout, ListView, ScrollView, Space, TextView
@@ -63,12 +65,10 @@ class LocationWidget(VBox):
     def __init__(self, context, locationHandler):
     
         VBox.__init__(self, context)
+        
         self.locationHandler = locationHandler
         
-        self.locations = {
-            "Oslo": "Norway/Oslo/Oslo/Oslo",
-            "Manchester": "United_Kingdom/England/Manchester"
-            }
+        self.locations = self.readLocations()
         
         keys = []
         for location in self.locations.keySet():
@@ -88,6 +88,48 @@ class LocationWidget(VBox):
             self.locationHandler.locationEntered(self.locations[location])
         except IndexError:
             pass
+    
+    @args(Map(String, String), [])
+    def readLocations(self):
+    
+        locations = {}
+        
+        # If no external storage is mounted then return None immediately to
+        # indicate failure.
+        
+        if Environment.getExternalStorageState() != Environment.MEDIA_MOUNTED:
+            return locations
+        
+        storageDir = Environment.getExternalStoragePublicDirectory(
+            Environment.DIRECTORY_DOWNLOADS)
+        
+        subdir = File(storageDir, "WeatherForecast")
+        if not subdir.exists():
+            return locations
+        
+        try:
+            f = File(subdir, "locations.txt")
+        except FileNotFoundException:
+            return locations
+        
+        stream = BufferedReader(FileReader(f))
+        while True:
+        
+            line = stream.readLine()
+            if line == None:
+                break
+            
+            index = line.indexOf(":")
+            if index == -1:
+                continue
+            
+            place = line[:index]
+            spec = line[index + 1:].trim()
+            locations[place] = spec
+        
+        stream.close()
+        
+        return locations
 
 
 class ForecastWidget(VBox):

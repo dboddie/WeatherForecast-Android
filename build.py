@@ -117,7 +117,8 @@ code_file = "src/weatherforecast.py"
 include_paths = []
 layout = None
 features = []
-permissions = ["android.permission.INTERNET"]
+permissions = ["android.permission.INTERNET",
+               "android.permission.READ_EXTERNAL_STORAGE"]
 
 if __name__ == "__main__":
 
