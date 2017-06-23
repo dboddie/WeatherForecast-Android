@@ -18,11 +18,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from java.lang import String
+from java.util import List
 from android.content import Context
 from android.graphics import Color, Typeface
 from android.view import Gravity, View, ViewGroup
-from android.widget import Button, EditText, ImageView, GridLayout, \
-                           LinearLayout, ScrollView, Space, TextView
+from android.widget import AdapterView, Button, EditText, ImageView, \
+    GridLayout, LinearLayout, ListView, ScrollView, Space, TextView
+
+from serpentine.adapters import StringListAdapter
 from serpentine.widgets import HBox, VBox
 
 from forecastparser import Forecast
@@ -34,9 +37,27 @@ class LocationListener:
         pass
 
 
+class LocationAdapter(StringListAdapter):
+
+    def __init__(self, strings):
+    
+        StringListAdapter.__init__(self, strings)
+    
+    def getView(self, position, convertView, parent):
+    
+        # If convertView is not None then reuse it.
+        if convertView != None:
+            return convertView
+        
+        view = TextView(parent.getContext())
+        view.setText(self.items[position])
+        view.setTextSize(view.getTextSize() * 1.25)
+        return view
+
+
 class LocationWidget(VBox):
 
-    __interfaces__ = [View.OnClickListener]
+    __interfaces__ = [AdapterView.OnItemClickListener]
     
     @args(void, [Context, LocationListener])
     def __init__(self, context, locationHandler):
@@ -44,15 +65,29 @@ class LocationWidget(VBox):
         VBox.__init__(self, context)
         self.locationHandler = locationHandler
         
-        button = Button(context)
-        button.setText("Fetch forecast")
-        button.setOnClickListener(self)
+        self.locations = {
+            "Oslo": "Norway/Oslo/Oslo/Oslo",
+            "Manchester": "United_Kingdom/England/Manchester"
+            }
         
-        self.addView(button)
+        keys = []
+        for location in self.locations.keySet():
+            keys.add(location)
+        
+        listView = ListView(context)
+        self.adapter = LocationAdapter(keys)
+        listView.setAdapter(self.adapter)
+        listView.setOnItemClickListener(self)
+        
+        self.addView(listView)
     
-    def onClick(self, view):
+    def onItemClick(self, parent, view, position, id):
     
-        self.locationHandler.locationEntered("Hello")
+        try:
+            location = self.adapter.items[int(id)]
+            self.locationHandler.locationEntered(self.locations[location])
+        except IndexError:
+            pass
 
 
 class ForecastWidget(ScrollView):
@@ -65,6 +100,15 @@ class ForecastWidget(ScrollView):
         self.grid.setColumnCount(2)
         #self.grid.setUseDefaultMargins(True)
         self.addView(self.grid)
+    
+    @args(void, [List(Forecast)])
+    def addForecasts(self, forecasts):
+    
+        self.grid.removeAllViews()
+        self.scrollTo(0, 0)
+        
+        for forecast in forecasts:
+            self.addForecast(forecast)
     
     @args(void, [Forecast])
     def addForecast(self, forecast):
