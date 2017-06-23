@@ -66,7 +66,7 @@ class ForecastParser(Object):
         section = ""
         sections = {"location", "credit", "tabular"}
         
-        dateFormat = SimpleDateFormat("yyyy-MM-DD HH:mm:ss")
+        dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
         dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"))
         sunrise = Date()
         sunset = Date()
@@ -104,8 +104,8 @@ class ForecastParser(Object):
                         forecast.place = place
                         forecast.credit = credit
                         
-                        from_ = parser.getAttributeValue(None, "from").replace("T", " ")
-                        to_ = parser.getAttributeValue(None, "to").replace("T", " ")
+                        from_ = parser.getAttributeValue(None, "from")
+                        to_ = parser.getAttributeValue(None, "to")
                         forecast.from_ = dateFormat.parse(from_, ParsePosition(0))
                         forecast.to_ = dateFormat.parse(to_, ParsePosition(0))
                     
@@ -139,8 +139,8 @@ class ForecastParser(Object):
                         forecast.temperatureUnit = parser.getAttributeValue(None, "unit")
                 
                 elif name == "sun":
-                    rise = parser.getAttributeValue(None, "rise").replace("T", " ")
-                    sset = parser.getAttributeValue(None, "set").replace("T", " ")
+                    rise = parser.getAttributeValue(None, "rise")
+                    sset = parser.getAttributeValue(None, "set")
                     sunrise = dateFormat.parse(rise, ParsePosition(0))
                     sunset = dateFormat.parse(sset, ParsePosition(0))
             
