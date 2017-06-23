@@ -107,27 +107,28 @@ class LocationWidget(VBox):
         if not subdir.exists():
             return locations
         
+        f = File(subdir, "locations.txt")
+        
         try:
-            f = File(subdir, "locations.txt")
+            stream = BufferedReader(FileReader(f))
+            while True:
+            
+                line = stream.readLine()
+                if line == None:
+                    break
+                
+                index = line.indexOf(":")
+                if index == -1:
+                    continue
+                
+                place = line[:index]
+                spec = line[index + 1:].trim()
+                locations[place] = spec
+            
+            stream.close()
+        
         except FileNotFoundException:
-            return locations
-        
-        stream = BufferedReader(FileReader(f))
-        while True:
-        
-            line = stream.readLine()
-            if line == None:
-                break
-            
-            index = line.indexOf(":")
-            if index == -1:
-                continue
-            
-            place = line[:index]
-            spec = line[index + 1:].trim()
-            locations[place] = spec
-        
-        stream.close()
+            pass
         
         return locations
 
