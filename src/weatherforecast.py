@@ -77,7 +77,7 @@ class WeatherForecastActivity(Activity):
         
         length = connection.getContentLength()
         if length <= 0:
-            raise WeatherException("Zero length content")
+            raise WeatherException("No connection")
         
         try:
             stream = BufferedInputStream(connection.getInputStream())

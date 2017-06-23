@@ -90,22 +90,37 @@ class LocationWidget(VBox):
             pass
 
 
-class ForecastWidget(ScrollView):
+class ForecastWidget(VBox):
 
     def __init__(self, context):
     
-        ScrollView.__init__(self, context)
+        VBox.__init__(self, context)
+        
+        self.placeLabel = TextView(context)
+        self.placeLabel.setTextSize(self.placeLabel.getTextSize() * 1.5)
+        self.placeLabel.setGravity(Gravity.CENTER)
+        
+        self.scrollView = ScrollView(context)
+        self.creditLabel = TextView(context)
         
         self.grid = GridLayout(context)
         self.grid.setColumnCount(2)
         #self.grid.setUseDefaultMargins(True)
-        self.addView(self.grid)
+        self.scrollView.addView(self.grid)
+        
+        self.addView(self.creditLabel)
+        self.addView(self.placeLabel)
+        self.addView(self.scrollView)
     
     @args(void, [List(Forecast)])
     def addForecasts(self, forecasts):
     
         self.grid.removeAllViews()
-        self.scrollTo(0, 0)
+        self.scrollView.scrollTo(0, 0)
+        
+        if len(forecasts) > 0:
+            self.placeLabel.setText(forecasts[0].place)
+            self.creditLabel.setText(forecasts[0].credit)
         
         for forecast in forecasts:
             self.addForecast(forecast)
