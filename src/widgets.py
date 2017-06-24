@@ -94,9 +94,6 @@ class LocationWidget(VBox):
     
         locations = {}
         
-        # If no external storage is mounted then return None immediately to
-        # indicate failure.
-        
         if Environment.getExternalStorageState() != Environment.MEDIA_MOUNTED:
             return locations
         
