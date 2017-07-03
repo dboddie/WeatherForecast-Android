@@ -23,6 +23,19 @@ from Tools import buildhelper
 
 app_name = "Weather Forecast"
 package_name = "uk.org.boddie.android.weatherforecast"
+symbols = [
+    "1d", "1m", "1n", "2d", "2m", "2n", "3d", "3m", "3n",
+    "4", "5d", "5m", "5n", "6d", "6m", "6n", "7d", "7m",
+    "7n", "8d", "8m", "8n", "9", "10", "11", "12", "13",
+    "14", "15", "20d", "20m", "20n", "21d", "21m", "21n",
+    "22", "23", "24d", "24m", "24n", "25d", "25m", "25n",
+    "26d", "26m", "26n", "27d", "27m", "27n", "28d", "28m",
+    "28n", "29d", "29m", "29n", "30", "31", "32", "33", "34",
+    "40d", "40m", "40n", "41d", "41m", "41n", "42d", "42m",
+    "42n", "43d", "43m", "43n", "44d", "44m", "44n", "45d",
+    "45m", "45n", "46", "47", "48", "49", "50"
+    ]
+
 res_files = {
     "drawable": {
         "ic_launcher": "icon.svg",
@@ -110,7 +123,15 @@ res_files = {
         "s49": "images/49.svg",
         "s50": "images/50.svg"
         },
-    "raw": {"sample": "oslo.xml"}
+    "raw": {
+        "sample": "oslo.xml"
+        },
+    "values": {
+        "symbols": symbols,
+        # Store the resource IDs that will be allocated for each of the above
+        # images in a list that can be accessed at run time.
+        "resourceIDs": map(lambda x: 0x7f010000 | (x + 1), range(len(symbols)))
+        }
     }
 
 code_file = "src/weatherforecast.py"
