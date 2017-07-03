@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from java.io import InputStream
 from java.lang import Object, String
 from java.text import DateFormat, ParsePosition, SimpleDateFormat
-from java.util import Date, List, TimeZone
+from java.util import Date, GregorianCalendar, List, TimeZone
 from android.content.res import Resources
 from android.view import View
 from org.xmlpull.v1 import XmlPullParser, XmlPullParserFactory
@@ -95,6 +95,7 @@ class ForecastParser(Object):
                         
                         from_ = parser.getAttributeValue(None, "from")
                         to_ = parser.getAttributeValue(None, "to")
+                        
                         forecast.from_ = dateFormat.parse(from_, ParsePosition(0))
                         forecast.to_ = dateFormat.parse(to_, ParsePosition(0))
                     
@@ -103,14 +104,15 @@ class ForecastParser(Object):
                         forecast.description = parser.getAttributeValue(None, "name")
                         symbol = parser.getAttributeValue(None, "numberEx")
                         
+                        forecast.midDate = Date(forecast.from_.getTime()/2 + \
+                                                forecast.to_.getTime()/2)
                         try:
                             forecast.symbol = self.symbols[symbol]
                             continue
                         except KeyError:
                             pass
                         
-                        if forecast.from_.after(sunrise) and \
-                            forecast.from_.before(sunset):
+                        if self.isDayTime(forecast.midDate, sunrise, sunset):
                             symbol += "d"
                         else:
                             symbol += "n"
@@ -144,6 +146,30 @@ class ForecastParser(Object):
                     forecasts.add(forecast)
         
         return forecasts
+    
+    @args(bool, [Date, Date, Date])
+    def isDayTime(self, forecastDate, sunrise, sunset):
+    
+        # Only check the time, not the date, of the forecast against the
+        # sunrise and sunset times.
+                        
+        cal = GregorianCalendar(TimeZone.getTimeZone("UTC"))
+        cal.setTime(forecastDate)
+        
+        riseCal = GregorianCalendar(TimeZone.getTimeZone("UTC"))
+        riseCal.setTime(sunrise)
+        riseCal.set(cal.get(cal.YEAR), cal.get(cal.MONTH), cal.get(cal.DATE))
+        
+        setCal = GregorianCalendar(TimeZone.getTimeZone("UTC"))
+        setCal.setTime(sunset)
+        setCal.set(cal.get(cal.YEAR), cal.get(cal.MONTH), cal.get(cal.DATE))
+        
+        if cal.compareTo(riseCal) == -1:
+            return False
+        elif cal.compareTo(setCal) == 1:
+            return False
+        
+        return True
 
 
 class Forecast(Object):
@@ -151,7 +177,7 @@ class Forecast(Object):
     __fields__ = {
         "place": String,
         "credit": String,
-        "from_": Date, "to_": Date,
+        "from_": Date, "to_": Date, "midDate": Date,
         "symbol": int,
         "description": String,
         "windSpeed": String,

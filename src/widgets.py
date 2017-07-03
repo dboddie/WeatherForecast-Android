@@ -172,7 +172,7 @@ class ForecastWidget(VBox):
         
         # Date
         dateView = TextView(context)
-        dateView.setText(str(forecast.from_))
+        dateView.setText(str(forecast.midDate))
         dateView.setTypeface(Typeface.create(None, Typeface.BOLD))
         
         lp = GridLayout.LayoutParams(self.grid.spec(self.grid.getRowCount()),
