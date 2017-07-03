@@ -34,6 +34,8 @@ class ForecastParser(Object):
     
         Object.__init__(self)
         
+        # Obtain the keys and values to be used to create the symbols
+        # dictionary from the application's resources.
         symbols = resources.getStringArray(R.array.symbols)
         resourceIDs = resources.getIntArray(R.array.resourceIDs)
         

@@ -50,12 +50,12 @@ class WeatherForecastActivity(Activity):
     def locationEntered(self, location):
     
         self.state = "forecast"
-        stream = self.getSampleStream()
-        #try:
-        #    stream = self.fetchData(location)
-        #except WeatherException, e:
-        #    Toast.makeText(self, e.getMessage(), Toast.LENGTH_SHORT).show()
-        #    return
+        #stream = self.getSampleStream()
+        try:
+            stream = self.fetchData(location)
+        except WeatherException, e:
+            Toast.makeText(self, e.getMessage(), Toast.LENGTH_SHORT).show()
+            return
         
         objects = self.parser.parse(stream)
         self.forecastWidget.addForecasts(objects)

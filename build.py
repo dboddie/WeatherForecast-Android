@@ -129,7 +129,9 @@ res_files = {
     "values": {
         "symbols": symbols,
         # Store the resource IDs that will be allocated for each of the above
-        # images in a list that can be accessed at run time.
+        # images in a list that can be accessed at run time. This can be
+        # cross-referenced with the symbols list because resources are sorted
+        # by their keys before being encoded in the application's resources.
         "resourceIDs": map(lambda x: 0x7f010000 | (x + 1), range(len(symbols)))
         }
     }
