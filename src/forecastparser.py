@@ -41,8 +41,8 @@ class ForecastParser(Object):
         
         self.symbols = {}
         
-        for i in range(len(symbols)):
-            self.symbols[symbols[i]] = resourceIDs[i]
+        for pair in zip(symbols, resourceIDs):
+            self.symbols[pair.first()] = pair.second()
     
     @args(List(Forecast), [InputStream])
     def parse(self, stream):
