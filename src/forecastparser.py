@@ -39,10 +39,7 @@ class ForecastParser(Object):
         symbols = resources.getStringArray(R.array.symbols)
         resourceIDs = resources.getIntArray(R.array.resourceIDs)
         
-        self.symbols = {}
-        
-        for pair in zip(symbols, resourceIDs):
-            self.symbols[pair.first()] = pair.second()
+        self.symbols = dict(symbols, resourceIDs)
     
     @args(List(Forecast), [InputStream])
     def parse(self, stream):
