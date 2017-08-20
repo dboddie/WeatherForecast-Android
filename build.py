@@ -142,6 +142,7 @@ layout = None
 features = []
 permissions = ["android.permission.INTERNET",
                "android.permission.READ_EXTERNAL_STORAGE"]
+options = {"pngquant": "-f 32"}
 
 if __name__ == "__main__":
 
@@ -149,6 +150,6 @@ if __name__ == "__main__":
     
     result = buildhelper.main(__file__, app_name, package_name, res_files,
         layout, code_file, include_paths, features, permissions, args,
-        include_sources = False)
+        include_sources = False, options = options)
     
     sys.exit(result)
