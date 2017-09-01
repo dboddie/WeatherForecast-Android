@@ -63,15 +63,16 @@ class LocationWidget(VBox):
 
     __interfaces__ = [AdapterView.OnItemClickListener,
                       AdapterView.OnItemLongClickListener,
-                      NewLocationListener]
+                      AddLocationListener, RemoveLocationListener]
     
     @args(void, [Context, LocationListener])
     def __init__(self, context, locationHandler):
     
         VBox.__init__(self, context)
         
-        self.locationHandler = locationHandler
+        self.currentItem = -1
         
+        self.locationHandler = locationHandler
         self.adapter = self.getAdapter()
         
         self.listView = ListView(context)
@@ -79,11 +80,12 @@ class LocationWidget(VBox):
         self.listView.setOnItemClickListener(self)
         self.listView.setOnItemLongClickListener(self)
         
-        addNewWidget = AddNewWidget(context, self)
+        self.addWidget = AddWidget(context, self)
+        self.removeWidget = RemoveWidget(context, self)
         
         self.addView(self.listView)
         self.addWeightedView(Space(context), 1)
-        self.addView(addNewWidget)
+        self.addView(self.addWidget)
     
     def readLocations(self):
     
@@ -159,8 +161,11 @@ class LocationWidget(VBox):
             self.locationHandler.locationEntered(self.locations[location])
         except IndexError:
             pass
+        
+        if self.currentItem != -1:
+            self.leaveRemoveMode()
     
-    def newLocation(self, location):
+    def addLocation(self, location):
     
         spec = location.trim()
         pieces = spec.split("/")
@@ -181,39 +186,106 @@ class LocationWidget(VBox):
     
     def onItemLongClick(self, parent, view, position, id):
     
-        pass
+        self.currentItem = position
+        self.enterRemoveMode()
+        return True
+    
+    def enterRemoveMode(self):
+    
+        self.removeView(self.addWidget)
+        self.addView(self.removeWidget)
+    
+    def leaveRemoveMode(self):
+    
+        self.removeView(self.removeWidget)
+        self.addView(self.addWidget)
+    
+    def removeLocation(self):
+    
+        place = self.order.remove(self.currentItem)
+        self.locations.remove(place)
+        
+        self.adapter.items.remove(place)
+        self.listView.setAdapter(self.adapter)
+        
+        self.currentItem = -1
+        self.leaveRemoveMode()
+    
+    def cancelRemove(self):
+    
+        self.currentItem = -1
+        self.leaveRemoveMode()
 
 
-class NewLocationListener:
+class AddLocationListener:
 
     @args(void, [String])
-    def newLocation(self, location):
+    def addLocation(self, location):
         pass
 
 
-class AddNewWidget(HBox):
+class AddWidget(HBox):
 
     __interfaces__ = [View.OnClickListener]
     
-    @args(void, [Context, NewLocationListener])
+    @args(void, [Context, AddLocationListener])
     def __init__(self, context, handler):
     
         HBox.__init__(self, context)
         self.handler = handler
         
         self.locationEdit = EditText(context)
-        newButton = Button(context)
-        newButton.setText("Add")
-        newButton.setOnClickListener(self)
+        
+        self.addButton = Button(context)
+        self.addButton.setText("Add")
+        self.addButton.setOnClickListener(self)
         
         self.addWeightedView(self.locationEdit, 2)
-        self.addWeightedView(newButton, 0)
+        self.addWeightedView(self.addButton, 0)
     
     def onClick(self, view):
     
         text = str(CAST(self.locationEdit, TextView).getText())
-        self.handler.newLocation(text)
+        self.handler.addLocation(text)
         self.locationEdit.setText("")
+
+
+class RemoveLocationListener:
+
+    def removeLocation(self):
+        pass
+    
+    def cancelRemove(self):
+        pass
+
+
+class RemoveWidget(HBox):
+
+    __interfaces__ = [View.OnClickListener]
+    
+    @args(void, [Context, RemoveLocationListener])
+    def __init__(self, context, handler):
+    
+        HBox.__init__(self, context)
+        self.handler = handler
+        
+        self.removeButton = Button(context)
+        self.removeButton.setText("Remove")
+        self.removeButton.setOnClickListener(self)
+        
+        self.cancelButton = Button(context)
+        self.cancelButton.setText("Cancel")
+        self.cancelButton.setOnClickListener(self)
+        
+        self.addWeightedView(self.removeButton, 1)
+        self.addWeightedView(self.cancelButton, 1)
+    
+    def onClick(self, view):
+    
+        if view == self.removeButton:
+            self.handler.removeLocation()
+        else:
+            self.handler.cancelRemove()
 
 
 class ForecastWidget(VBox):
