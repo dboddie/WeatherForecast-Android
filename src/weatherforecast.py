@@ -47,6 +47,11 @@ class WeatherForecastActivity(Activity):
         self.setContentView(self.entryWidget)
         self.parser = ForecastParser(self.getResources())
     
+    def onPause(self):
+    
+        Activity.onPause(self)
+        self.entryWidget.writeLocations()
+    
     def locationEntered(self, location):
     
         self.state = "forecast"
@@ -57,11 +62,15 @@ class WeatherForecastActivity(Activity):
             Toast.makeText(self, e.getMessage(), Toast.LENGTH_SHORT).show()
             return
         
-        objects = self.parser.parse(stream)
-        self.forecastWidget.addForecasts(objects)
-        
-        self.setContentView(self.forecastWidget)
-        stream.close()
+        try:
+            objects = self.parser.parse(stream)
+            self.forecastWidget.addForecasts(objects)
+            
+            self.setContentView(self.forecastWidget)
+            stream.close()
+        except:
+            Toast.makeText(self, "Failed to read weather forecast,",
+                           Toast.LENGTH_SHORT).show()
     
     @args(InputStream, [])
     def getSampleStream(self):

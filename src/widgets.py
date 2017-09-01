@@ -17,7 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from java.io import BufferedReader, File, FileNotFoundException, FileReader
+from java.io import BufferedReader, File, FileNotFoundException, FileReader, \
+                    FileWriter
 from java.lang import String
 from java.util import List, Map
 from android.content import Context
@@ -27,6 +28,7 @@ from android.view import Gravity, View, ViewGroup
 from android.widget import AdapterView, Button, EditText, ImageView, \
     GridLayout, LinearLayout, ListView, ScrollView, Space, TextView
 
+from serpentine.files import Files
 from serpentine.adapters import StringListAdapter
 from serpentine.widgets import HBox, VBox
 
@@ -59,7 +61,9 @@ class LocationAdapter(StringListAdapter):
 
 class LocationWidget(VBox):
 
-    __interfaces__ = [AdapterView.OnItemClickListener]
+    __interfaces__ = [AdapterView.OnItemClickListener,
+                      AdapterView.OnItemLongClickListener,
+                      NewLocationListener]
     
     @args(void, [Context, LocationListener])
     def __init__(self, context, locationHandler):
@@ -68,18 +72,85 @@ class LocationWidget(VBox):
         
         self.locationHandler = locationHandler
         
-        self.locations = self.readLocations()
+        self.adapter = self.getAdapter()
+        
+        self.listView = ListView(context)
+        self.listView.setAdapter(self.adapter)
+        self.listView.setOnItemClickListener(self)
+        self.listView.setOnItemLongClickListener(self)
+        
+        addNewWidget = AddNewWidget(context, self)
+        
+        self.addView(self.listView)
+        self.addWeightedView(Space(context), 1)
+        self.addView(addNewWidget)
+    
+    def readLocations(self):
+    
+        self.locations = {}
+        self.order = []
+        
+        if Environment.getExternalStorageState() != Environment.MEDIA_MOUNTED:
+            return
+        
+        storageDir = Environment.getExternalStoragePublicDirectory(
+            Environment.DIRECTORY_DOWNLOADS)
+        
+        subdir = File(storageDir, "WeatherForecast")
+        if subdir.exists():
+        
+            f = File(subdir, "locations.txt")
+            
+            try:
+                stream = BufferedReader(FileReader(f))
+                while True:
+                
+                    line = stream.readLine()
+                    if line == None:
+                        break
+                    
+                    spec = line.trim()
+                    pieces = spec.split("/")
+                    
+                    if len(pieces) < 3:
+                        continue
+                    
+                    place = pieces[len(pieces) - 1]
+                    self.locations[place] = spec
+                    self.order.add(place)
+                
+                stream.close()
+            
+            except FileNotFoundException:
+                pass
+    
+    def writeLocations(self):
+    
+        f = Files.createExternalFile(Environment.DIRECTORY_DOWNLOADS,
+            "WeatherForecast", "locations.txt", None, None)
+        
+        try:
+            stream = FileWriter(f)
+            
+            for key in self.order:
+                stream.write(self.locations[key] + "\n")
+            
+            stream.flush()
+            stream.close()
+        
+        except FileNotFoundException:
+            pass
+    
+    @args(LocationAdapter, [])
+    def getAdapter(self):
+    
+        self.readLocations()
         
         keys = []
-        for location in self.locations.keySet():
+        for location in self.order:
             keys.add(location)
         
-        listView = ListView(context)
-        self.adapter = LocationAdapter(keys)
-        listView.setAdapter(self.adapter)
-        listView.setOnItemClickListener(self)
-        
-        self.addView(listView)
+        return LocationAdapter(keys)
     
     def onItemClick(self, parent, view, position, id):
     
@@ -89,45 +160,60 @@ class LocationWidget(VBox):
         except IndexError:
             pass
     
-    @args(Map(String, String), [])
-    def readLocations(self):
+    def newLocation(self, location):
     
-        locations = {}
+        spec = location.trim()
+        pieces = spec.split("/")
         
-        if Environment.getExternalStorageState() != Environment.MEDIA_MOUNTED:
-            return locations
+        if len(pieces) < 3:
+            return
         
-        storageDir = Environment.getExternalStoragePublicDirectory(
-            Environment.DIRECTORY_DOWNLOADS)
+        place = pieces[len(pieces) - 1]
         
-        subdir = File(storageDir, "WeatherForecast")
-        if not subdir.exists():
-            return locations
+        if self.locations.containsKey(place):
+            return
         
-        f = File(subdir, "locations.txt")
+        self.locations[place] = spec
+        self.order.add(place)
         
-        try:
-            stream = BufferedReader(FileReader(f))
-            while True:
-            
-                line = stream.readLine()
-                if line == None:
-                    break
-                
-                index = line.indexOf(":")
-                if index == -1:
-                    continue
-                
-                place = line[:index]
-                spec = line[index + 1:].trim()
-                locations[place] = spec
-            
-            stream.close()
+        self.adapter.items.add(place)
+        self.listView.setAdapter(self.adapter)
+    
+    def onItemLongClick(self, parent, view, position, id):
+    
+        pass
+
+
+class NewLocationListener:
+
+    @args(void, [String])
+    def newLocation(self, location):
+        pass
+
+
+class AddNewWidget(HBox):
+
+    __interfaces__ = [View.OnClickListener]
+    
+    @args(void, [Context, NewLocationListener])
+    def __init__(self, context, handler):
+    
+        HBox.__init__(self, context)
+        self.handler = handler
         
-        except FileNotFoundException:
-            pass
+        self.locationEdit = EditText(context)
+        newButton = Button(context)
+        newButton.setText("Add")
+        newButton.setOnClickListener(self)
         
-        return locations
+        self.addWeightedView(self.locationEdit, 2)
+        self.addWeightedView(newButton, 0)
+    
+    def onClick(self, view):
+    
+        text = str(CAST(self.locationEdit, TextView).getText())
+        self.handler.newLocation(text)
+        self.locationEdit.setText("")
 
 
 class ForecastWidget(VBox):
