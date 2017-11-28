@@ -338,7 +338,8 @@ class ForecastWidget(RelativeLayout):
         self.creditLabel = TextView(context)
         self.creditLabel.setId(2)
         
-        self.forecastLayout = RelativeLayout(context)
+        self.forecastLayout = LinearLayout(context)
+        self.forecastLayout.setOrientation(LinearLayout.VERTICAL)
         self.scrollView.addView(self.forecastLayout)
         
         placeParams = RelativeLayout.LayoutParams(
@@ -376,110 +377,77 @@ class ForecastWidget(RelativeLayout):
         self.creditLabel.setText(forecasts[0].credit)
         
         context = self.getContext()
-        previousId = 0
-        nextId = 0x100
-        
-        last_forecast = forecasts[len(forecasts) - 1]
         
         for forecast in forecasts:
         
-            is_last = forecast == last_forecast
-            
             #             Date
             # Temperature Symbol Description
             #                    Wind
             
             # Date
-            dateId = nextId
-            
             dateView = TextView(context)
             dateView.setText(str(forecast.midDate))
             dateView.setGravity(Gravity.CENTER)
             dateView.setTypeface(Typeface.create(None, Typeface.BOLD))
-            dateView.setId(dateId)
             
-            lp = RelativeLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT)
+            self.forecastLayout.addView(dateView, self.rowLayout())
             
-            if previousId == 0:
-                lp.addRule(RelativeLayout.ALIGN_PARENT_TOP)
-            else:
-                lp.addRule(RelativeLayout.BELOW, previousId)
-            
-            lp.addRule(RelativeLayout.CENTER_HORIZONTAL)
-            
-            self.forecastLayout.addView(dateView, lp)
+            # Symbol, temperature, description and wind
+            row = RelativeLayout(context)
             
             # Symbol
-            symbolId = dateId + 1
-            
-            lp = RelativeLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT)
-            
-            lp.addRule(RelativeLayout.BELOW, dateId)
-            lp.addRule(RelativeLayout.CENTER_HORIZONTAL)
+            lp = self.itemLayout()
+            lp.addRule(RelativeLayout.CENTER_IN_PARENT)
             
             if forecast.symbol != -1:
                 imageView = ImageView(context)
                 imageView.setImageResource(forecast.symbol)
-                imageView.setId(symbolId)
-                self.forecastLayout.addView(imageView, lp)
+                row.addView(imageView, lp)
             else:
                 spacer = Space(context)
-                spacer.setId(symbolId)
-                self.forecastLayout.addView(spacer, lp)
+                row.addView(spacer, lp)
             
             # Temperature
-            tempId = symbolId + 1
-            
             tempView = TextView(context)
             tempView.setTextSize(tempView.getTextSize() * 2)
-            tempView.setId(tempId)
             
             if forecast.temperatureUnit == "celsius":
                 tempView.setText(forecast.temperature + u"\u2103")
             else:
                 tempView.setText(forecast.temperature + " " + forecast.temperatureUnit)
             
-            lp = RelativeLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT)
-            
-            lp.addRule(RelativeLayout.ALIGN_BOTTOM, symbolId)
+            lp = self.itemLayout()
+            lp.addRule(RelativeLayout.CENTER_VERTICAL)
             lp.addRule(RelativeLayout.ALIGN_PARENT_LEFT)
-            
-            self.forecastLayout.addView(tempView, lp)
+            row.addView(tempView, lp)
             
             # Description and wind speed
-            descId = tempId + 1
+            descLayout = LinearLayout(context)
+            descLayout.setOrientation(LinearLayout.VERTICAL)
             
             descView = TextView(context)
             descView.setText(forecast.description)
-            descView.setId(descId)
-            
-            lp = RelativeLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT)
-            
-            lp.addRule(RelativeLayout.ALIGN_TOP, tempId)
-            lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
-            self.forecastLayout.addView(descView, lp)
+            descLayout.addView(descView, lp)
             
             windView = TextView(context)
             windView.setText(forecast.windSpeed)
+            descLayout.addView(windView, lp)
             
-            lp = RelativeLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT)
-            
-            lp.addRule(RelativeLayout.BELOW, descId)
+            lp = self.itemLayout()
+            lp.addRule(RelativeLayout.CENTER_VERTICAL)
             lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
-            if is_last:
-                lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
+            row.addView(descLayout, lp)
             
-            self.forecastLayout.addView(windView, lp)
-            
-            previousId = symbolId
-            nextId = descId + 1
+            self.forecastLayout.addView(row, self.rowLayout())
+    
+    @args(LinearLayout.LayoutParams, [])
+    def rowLayout(self):
+    
+        return LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                                         ViewGroup.LayoutParams.WRAP_CONTENT)
+    
+    @args(RelativeLayout.LayoutParams, [])
+    def itemLayout(self):
+    
+        return RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                                           ViewGroup.LayoutParams.WRAP_CONTENT)
