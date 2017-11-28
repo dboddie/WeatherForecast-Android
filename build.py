@@ -124,7 +124,7 @@ res_files = {
         "s50": "images/png/50.png"
         },
     "raw": {
-        "sample": "oslo.xml"
+        "sample": "tests/oslo.xml"
         },
     "values": {
         "symbols": symbols,
