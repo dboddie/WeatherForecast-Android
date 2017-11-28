@@ -26,11 +26,12 @@ from android.graphics import Color, Typeface
 from android.os import Environment
 from android.view import Gravity, View, ViewGroup
 from android.widget import AdapterView, Button, EditText, ImageView, \
-    GridLayout, LinearLayout, ListView, ScrollView, Space, TextView
+    GridLayout, LinearLayout, ListView, RelativeLayout, ScrollView, Space, \
+    TextView
 
 from serpentine.files import Files
 from serpentine.adapters import StringListAdapter
-from serpentine.widgets import HBox, VBox
+from serpentine.widgets import HBox
 
 from forecastparser import Forecast
 
@@ -59,7 +60,7 @@ class LocationAdapter(StringListAdapter):
         return view
 
 
-class LocationWidget(VBox):
+class LocationWidget(RelativeLayout):
 
     __interfaces__ = [AdapterView.OnItemClickListener,
                       AdapterView.OnItemLongClickListener,
@@ -68,9 +69,10 @@ class LocationWidget(VBox):
     @args(void, [Context, LocationListener])
     def __init__(self, context, locationHandler):
     
-        VBox.__init__(self, context)
+        RelativeLayout.__init__(self, context)
         
         self.currentItem = -1
+        self.mode = "normal"
         
         self.locationHandler = locationHandler
         self.adapter = self.getAdapter()
@@ -81,11 +83,17 @@ class LocationWidget(VBox):
         self.listView.setOnItemLongClickListener(self)
         
         self.addWidget = AddWidget(context, self)
+        self.addWidget.setId(1)
         self.removeWidget = RemoveWidget(context, self)
         
-        self.addView(self.listView)
-        self.addWeightedView(Space(context), 1)
-        self.addView(self.addWidget)
+        listParams = RelativeLayout.LayoutParams(
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT)
+        listParams.addRule(RelativeLayout.ALIGN_PARENT_TOP)
+        listParams.addRule(RelativeLayout.ABOVE, 1)
+        
+        self.addView(self.listView, listParams)
+        self.addView(self.addWidget, self.getAddParams())
     
     def readLocations(self):
     
@@ -186,19 +194,35 @@ class LocationWidget(VBox):
     
     def onItemLongClick(self, parent, view, position, id):
     
-        self.currentItem = position
-        self.enterRemoveMode()
+        if self.mode == "normal":
+            self.currentItem = position
+            self.enterRemoveMode()
+        
         return True
     
     def enterRemoveMode(self):
     
         self.removeView(self.addWidget)
-        self.addView(self.removeWidget)
+        self.addWidget.setId(2)
+        
+        removeParams = RelativeLayout.LayoutParams(
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT)
+        removeParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
+        removeParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT)
+        removeParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
+        
+        self.addView(self.removeWidget, removeParams)
+        self.removeWidget.setId(1)
+        self.mode = "remove"
     
     def leaveRemoveMode(self):
     
         self.removeView(self.removeWidget)
-        self.addView(self.addWidget)
+        self.removeWidget.setId(2)
+        self.addView(self.addWidget, self.getAddParams())
+        self.addWidget.setId(1)
+        self.mode = "normal"
     
     def removeLocation(self):
     
@@ -215,6 +239,17 @@ class LocationWidget(VBox):
     
         self.currentItem = -1
         self.leaveRemoveMode()
+    
+    @args(RelativeLayout.LayoutParams, [])
+    def getAddParams(self):
+    
+        addParams = RelativeLayout.LayoutParams(
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT)
+        addParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
+        addParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT)
+        addParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
+        return addParams
 
 
 class AddLocationListener:
@@ -288,27 +323,47 @@ class RemoveWidget(HBox):
             self.handler.cancelRemove()
 
 
-class ForecastWidget(VBox):
+class ForecastWidget(RelativeLayout):
 
     def __init__(self, context):
     
-        VBox.__init__(self, context)
+        RelativeLayout.__init__(self, context)
         
         self.placeLabel = TextView(context)
         self.placeLabel.setTextSize(self.placeLabel.getTextSize() * 1.5)
         self.placeLabel.setGravity(Gravity.CENTER)
+        self.placeLabel.setId(1)
         
         self.scrollView = ScrollView(context)
         self.creditLabel = TextView(context)
+        self.creditLabel.setId(2)
         
         self.grid = GridLayout(context)
         self.grid.setColumnCount(2)
         #self.grid.setUseDefaultMargins(True)
         self.scrollView.addView(self.grid)
         
-        self.addView(self.creditLabel)
-        self.addView(self.placeLabel)
-        self.addView(self.scrollView)
+        placeParams = RelativeLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT)
+        placeParams.addRule(RelativeLayout.ALIGN_PARENT_TOP)
+        placeParams.addRule(RelativeLayout.CENTER_HORIZONTAL)
+        
+        scrollParams = RelativeLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT)
+        scrollParams.addRule(RelativeLayout.BELOW, 1)
+        scrollParams.addRule(RelativeLayout.ABOVE, 2)
+        scrollParams.addRule(RelativeLayout.CENTER_HORIZONTAL)
+        
+        creditParams = RelativeLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT)
+        creditParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
+        
+        self.addView(self.placeLabel, placeParams)
+        self.addView(self.scrollView, scrollParams)
+        self.addView(self.creditLabel, creditParams)
     
     @args(void, [List(Forecast)])
     def addForecasts(self, forecasts):
