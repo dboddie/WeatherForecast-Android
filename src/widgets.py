@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from java.io import BufferedReader, File, FileNotFoundException, FileReader, \
                     FileWriter
 from java.lang import String
-from java.util import List, Map
+from java.util import Calendar, List, Locale, Map
 from android.content import Context
 from android.graphics import Color, Typeface
 from android.os import Environment
@@ -376,6 +376,12 @@ class ForecastWidget(RelativeLayout):
         self.placeLabel.setText(forecasts[0].place)
         self.creditLabel.setText(forecasts[0].credit)
         
+        firstDate = forecasts[0].midDate
+        calendar = Calendar.getInstance()
+        calendar.setTime(firstDate)
+        
+        currentDay = calendar.get(Calendar.DAY_OF_MONTH)
+        
         context = self.getContext()
         
         for forecast in forecasts:
@@ -384,13 +390,43 @@ class ForecastWidget(RelativeLayout):
             # Temperature Symbol Description
             #                    Wind
             
-            # Date
-            dateView = TextView(context)
-            dateView.setText(str(forecast.midDate))
-            dateView.setGravity(Gravity.CENTER)
-            dateView.setTypeface(Typeface.create(None, Typeface.BOLD))
+            # Get the day of the month.
+            date = forecast.midDate
+            calendar.setTime(date)
+            day = calendar.get(Calendar.DAY_OF_MONTH)
             
-            self.forecastLayout.addView(dateView, self.rowLayout())
+            # Add an item for the date for the first item and any item
+            # following a day change.
+            if date == firstDate or day != currentDay:
+                dateView = TextView(context)
+                dateView.setText(
+                    calendar.getDisplayName(Calendar.DAY_OF_WEEK,
+                        Calendar.LONG, Locale.getDefault()) + " " + \
+                    str(day) + " " + \
+                    calendar.getDisplayName(Calendar.MONTH,
+                        Calendar.LONG, Locale.getDefault()) + " " + \
+                    str(calendar.get(Calendar.YEAR)))
+                
+                dateView.setGravity(Gravity.CENTER)
+                dateView.setTypeface(Typeface.create(None, Typeface.BOLD))
+                
+                self.forecastLayout.addView(dateView, self.rowLayout())
+            
+            currentDay = day
+            
+            # Time
+            timeView = TextView(context)
+            timeView.setText(
+                String.format("%02d:%02d:%02d",
+                    array([calendar.get(Calendar.HOUR_OF_DAY),
+                           calendar.get(Calendar.MINUTE),
+                           calendar.get(Calendar.SECOND)]))
+                )
+            
+            timeView.setGravity(Gravity.CENTER)
+            timeView.setTypeface(Typeface.create(None, Typeface.BOLD))
+            
+            self.forecastLayout.addView(timeView, self.rowLayout())
             
             # Symbol, temperature, description and wind
             row = RelativeLayout(context)

@@ -62,13 +62,13 @@ class WeatherForecastActivity(Activity):
             Toast.makeText(self, e.getMessage(), Toast.LENGTH_SHORT).show()
             return
         
-        try:
+        if True:
             objects = self.parser.parse(stream)
             self.forecastWidget.addForecasts(objects)
             
             self.setContentView(self.forecastWidget)
             stream.close()
-        except:
+        else:
             Toast.makeText(self, "Failed to read weather forecast,",
                            Toast.LENGTH_SHORT).show()
     
