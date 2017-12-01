@@ -1,0 +1,3 @@
+http://fil.nrk.no/yr/viktigestader/noreg.txt
+http://fil.nrk.no/yr/viktigestader/verda.txt
+http://download.geonames.org/export/dump/cities1000.zip

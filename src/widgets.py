@@ -25,13 +25,17 @@ from android.content import Context
 from android.graphics import Color, Typeface
 from android.os import Environment
 from android.view import Gravity, View, ViewGroup
-from android.widget import AdapterView, Button, EditText, ImageView, \
-    LinearLayout, ListView, RelativeLayout, ScrollView, Space, \
-    TextView
+from android.widget import AdapterView, AutoCompleteTextView, Button, \
+    EditText, ImageView, LinearLayout, ListView, RelativeLayout, ScrollView, \
+    Space, TextView
+
+import android.R
 
 from serpentine.files import Files
-from serpentine.adapters import StringListAdapter
+from serpentine.adapters import FilterStringArrayAdapter, StringListAdapter
 from serpentine.widgets import HBox
+
+from app_resources import R
 
 from forecastparser import Forecast
 
@@ -173,23 +177,15 @@ class LocationWidget(RelativeLayout):
         if self.currentItem != -1:
             self.leaveRemoveMode()
     
-    def addLocation(self, location):
+    def addLocation(self, name, spec):
     
-        spec = location.trim()
-        pieces = spec.split("/")
-        
-        if len(pieces) < 3:
+        if self.locations.containsKey(name):
             return
         
-        place = pieces[len(pieces) - 1]
+        self.locations[name] = spec
+        self.order.add(name)
         
-        if self.locations.containsKey(place):
-            return
-        
-        self.locations[place] = spec
-        self.order.add(place)
-        
-        self.adapter.items.add(place)
+        self.adapter.items.add(name)
         self.listView.setAdapter(self.adapter)
     
     def onItemLongClick(self, parent, view, position, id):
@@ -254,8 +250,8 @@ class LocationWidget(RelativeLayout):
 
 class AddLocationListener:
 
-    @args(void, [String])
-    def addLocation(self, location):
+    @args(void, [String, String])
+    def addLocation(self, name, spec):
         pass
 
 
@@ -269,7 +265,23 @@ class AddWidget(HBox):
         HBox.__init__(self, context)
         self.handler = handler
         
-        self.locationEdit = EditText(context)
+        # Read the lists of place names and place specifications from the
+        # application's resources, creating a dictionary from the two lists.
+        self.places = {}
+        resources = context.getResources()
+        place_names = resources.getStringArray(R.array.place_names)
+        
+        for name, place in zip(place_names,
+                               resources.getStringArray(R.array.places)):
+            self.places[name] = place
+        
+        # Use a specialised adapter to provide filtered lists of data for an
+        # auto-complete-enabled text view.
+        adapter = FilterStringArrayAdapter(context,
+            android.R.layout.simple_dropdown_item_1line, place_names)
+        
+        self.locationEdit = AutoCompleteTextView(context)
+        self.locationEdit.setAdapter(adapter)
         
         self.addButton = Button(context)
         self.addButton.setText("Add")
@@ -281,7 +293,18 @@ class AddWidget(HBox):
     def onClick(self, view):
     
         text = str(CAST(self.locationEdit, TextView).getText())
-        self.handler.addLocation(text)
+        
+        name = text.trim()
+        
+        try:
+            spec = self.places[name]
+        except KeyError:
+            return
+        
+        # Remove the country from the name.
+        name = name[:name.indexOf(", ")]
+        
+        self.handler.addLocation(name, spec)
         self.locationEdit.setText("")
 
 

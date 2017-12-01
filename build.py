@@ -17,9 +17,45 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import os, sys
+import codecs, os, sys
 
 from Tools import buildhelper
+
+def read_places():
+
+    lines = codecs.open("data/noreg.txt", "r", "utf8").readlines()
+    lines.pop(0)
+    
+    places = {}
+    
+    for line in lines:
+
+        pieces = line.strip().split("\t")
+        place_type = pieces[3]
+        if place_type == "By":
+            name = pieces[1] + u", Norway"
+            url = pieces[-1]
+            place = url[len("http://www.yr.no/place/"):-len("/forecast.xml")]
+            places[name] = place
+
+    lines = codecs.open("data/verda.txt", "r", "utf8").readlines()
+    lines.pop(0)
+    include_places = ['administration centre', 'airport', 'capital', 'city',
+        'island', 'locality', 'populated locality', 'populated place',
+        'regional capital', 'seat of government', 'town']
+    
+    for line in lines:
+    
+        pieces = line.strip().split("\t")
+        place_type = pieces[7]
+        if place_type in include_places:
+            name = pieces[3] + u", %s" % pieces[10]
+            url = pieces[-1]
+            place = url[len("http://www.yr.no/place/"):-len("/forecast.xml")]
+            places[name] = place
+    
+    return places.keys(), places.values()
+
 
 app_name = "Weather Forecast"
 package_name = "uk.org.boddie.android.weatherforecast"
@@ -35,6 +71,8 @@ symbols = [
     "42n", "43d", "43m", "43n", "44d", "44m", "44n", "45d",
     "45m", "45n", "46", "47", "48", "49", "50"
     ]
+
+place_names, places = read_places()
 
 res_files = {
     "drawable": {
@@ -128,6 +166,8 @@ res_files = {
         },
     "values": {
         "symbols": symbols,
+        "place_names": place_names,
+        "places": places,
         # Store the resource IDs that will be allocated for each of the above
         # images in a list that can be accessed at run time. This can be
         # cross-referenced with the symbols list because resources are sorted
