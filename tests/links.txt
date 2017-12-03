@@ -1,0 +1,2 @@
+http://api.met.no/weatherapi/locationforecast/1.9/?lat=60.10;lon=9.58
+http://api.met.no/weatherapi/locationforecastlts/1.3/?lat=60.10;lon=9.58
