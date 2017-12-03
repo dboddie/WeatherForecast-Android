@@ -399,7 +399,7 @@ class ForecastWidget(RelativeLayout):
         self.placeLabel.setText(forecasts[0].place)
         self.creditLabel.setText(forecasts[0].credit)
         
-        firstDate = forecasts[0].midDate
+        firstDate = forecasts[0].from_
         calendar = Calendar.getInstance()
         calendar.setTime(firstDate)
         
@@ -414,7 +414,7 @@ class ForecastWidget(RelativeLayout):
             #                    Wind
             
             # Get the day of the month.
-            date = forecast.midDate
+            date = forecast.from_
             calendar.setTime(date)
             day = calendar.get(Calendar.DAY_OF_MONTH)
             
@@ -438,13 +438,21 @@ class ForecastWidget(RelativeLayout):
             currentDay = day
             
             # Time
+            timeString = String.format("%02d:%02d:%02d - ",
+                array([calendar.get(Calendar.HOUR_OF_DAY),
+                       calendar.get(Calendar.MINUTE),
+                       calendar.get(Calendar.SECOND)]))
+            
+            date = forecast.to_
+            calendar.setTime(date)
+            
+            timeString += String.format("%02d:%02d:%02d",
+                array([calendar.get(Calendar.HOUR_OF_DAY),
+                       calendar.get(Calendar.MINUTE),
+                       calendar.get(Calendar.SECOND)]))
+            
             timeView = TextView(context)
-            timeView.setText(
-                String.format("%02d:%02d:%02d",
-                    array([calendar.get(Calendar.HOUR_OF_DAY),
-                           calendar.get(Calendar.MINUTE),
-                           calendar.get(Calendar.SECOND)]))
-                )
+            timeView.setText(timeString)
             
             timeView.setGravity(Gravity.CENTER)
             timeView.setTypeface(Typeface.create(None, Typeface.BOLD))
