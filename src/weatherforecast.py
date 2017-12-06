@@ -58,7 +58,6 @@ class WeatherForecastActivity(Activity):
     
     def locationEntered(self, location):
     
-        #stream = self.getSampleStream()
         try:
             forecasts = self.fetchData(location)
         except WeatherException, e:
@@ -107,6 +106,7 @@ class WeatherForecastActivity(Activity):
         except FileNotFoundException:
             raise WeatherException("Resource not found")
         
+        #stream = self.getSampleStream()
         forecasts = self.parser.parse(stream)
         stream.close()
         
