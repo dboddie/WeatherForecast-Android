@@ -98,9 +98,9 @@ class WeatherForecastActivity(Activity):
         connection = CAST(url.openConnection(), HttpURLConnection)
         connection.setInstanceFollowRedirects(True)
         
-        length = connection.getContentLength()
-        if length <= 0:
-            raise WeatherException("No connection")
+        #length = connection.getContentLength()
+        #if length <= 0:
+        #    raise WeatherException("No connection")
         
         try:
             stream = BufferedInputStream(connection.getInputStream())
@@ -136,3 +136,4 @@ class CacheItem(Object):
         
         self.time = time
         self.forecasts = forecasts
+
