@@ -58,6 +58,7 @@ class WeatherForecastActivity(Activity):
     
     def locationEntered(self, location):
     
+        #stream = self.getSampleStream()
         try:
             forecasts = self.fetchData(location)
         except WeatherException, e:
@@ -97,16 +98,15 @@ class WeatherForecastActivity(Activity):
         connection = CAST(url.openConnection(), HttpURLConnection)
         connection.setInstanceFollowRedirects(True)
         
-        length = connection.getContentLength()
-        if length <= 0:
-            raise WeatherException("No connection")
+        #length = connection.getContentLength()
+        #if length <= 0:
+        #    raise WeatherException("No connection")
         
         try:
             stream = BufferedInputStream(connection.getInputStream())
         except FileNotFoundException:
             raise WeatherException("Resource not found")
         
-        #stream = self.getSampleStream()
         forecasts = self.parser.parse(stream)
         stream.close()
         
@@ -136,3 +136,4 @@ class CacheItem(Object):
         
         self.time = time
         self.forecasts = forecasts
+
