@@ -104,7 +104,7 @@ class WeatherForecastActivity(Activity):
         
         try:
             stream = BufferedInputStream(connection.getInputStream())
-        except FileNotFoundException:
+        except:
             raise WeatherException("Resource not found")
         
         forecasts = self.parser.parse(stream)
