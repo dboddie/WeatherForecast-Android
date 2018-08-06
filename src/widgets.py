@@ -353,7 +353,8 @@ class ForecastWidget(RelativeLayout):
         RelativeLayout.__init__(self, context)
         
         # This getColor call deprecated in API level 23.
-        lightBackground = context.getResources().getColor(android.R.color.background_light)
+        self.lightBackground = context.getResources().getColor(android.R.color.background_light)
+        self.darkText = 0xff000000
         
         # Header
         header = LinearLayout(context)
@@ -365,7 +366,7 @@ class ForecastWidget(RelativeLayout):
         self.placeLabel.setGravity(Gravity.CENTER)
         
         headerLine = View(context)
-        headerLine.setBackgroundColor(lightBackground)
+        headerLine.setBackgroundColor(self.lightBackground)
         headerLineParams = LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT, 1) # 1 pixel in height
         
@@ -382,7 +383,7 @@ class ForecastWidget(RelativeLayout):
         footer.setId(3)
         
         footerLine = View(context)
-        footerLine.setBackgroundColor(lightBackground)
+        footerLine.setBackgroundColor(self.lightBackground)
         footerLineParams = LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT, 1) # 1 pixel in height
         
@@ -464,6 +465,8 @@ class ForecastWidget(RelativeLayout):
                 
                 dateView.setGravity(Gravity.CENTER)
                 dateView.setTypeface(Typeface.create(None, Typeface.BOLD))
+                dateView.setBackgroundColor(self.lightBackground)
+                dateView.setTextColor(0xff000000)
                 
                 self.forecastLayout.addView(dateView, self.rowLayout())
             

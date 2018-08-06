@@ -68,6 +68,12 @@ This information is presumably provided under the terms of the Creative Commons
 Attribution 4.0 International (CC BY 4.0) license, as used by the geonames.org
 service for the data the noreg.txt and verda.txt files are based on.
 
+The symbols supplied were obtained from the following repository and are
+licensed under the MIT license:
+
+https://github.com/YR/weather-symbols/
+https://github.com/YR/weather-symbols/blob/master/LICENSE
+
 License
 -------
 
