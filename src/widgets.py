@@ -352,40 +352,72 @@ class ForecastWidget(RelativeLayout):
     
         RelativeLayout.__init__(self, context)
         
+        # This getColor call deprecated in API level 23.
+        lightBackground = context.getResources().getColor(android.R.color.background_light)
+        
+        # Header
+        header = LinearLayout(context)
+        header.setOrientation(LinearLayout.VERTICAL)
+        header.setId(1)
+        
         self.placeLabel = TextView(context)
         self.placeLabel.setTextSize(self.placeLabel.getTextSize() * 1.5)
         self.placeLabel.setGravity(Gravity.CENTER)
-        self.placeLabel.setId(1)
         
+        headerLine = View(context)
+        headerLine.setBackgroundColor(lightBackground)
+        headerLineParams = LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, 1) # 1 pixel in height
+        
+        header.addView(self.placeLabel)
+        header.addView(headerLine, headerLineParams)
+        
+        # Middle - containing the forecast layout
         self.scrollView = ScrollView(context)
-        self.creditLabel = TextView(context)
-        self.creditLabel.setId(2)
+        self.scrollView.setId(2)
         
+        # Footer
+        footer = LinearLayout(context)
+        footer.setOrientation(LinearLayout.VERTICAL)
+        footer.setId(3)
+        
+        footerLine = View(context)
+        footerLine.setBackgroundColor(lightBackground)
+        footerLineParams = LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, 1) # 1 pixel in height
+        
+        self.creditLabel = TextView(context)
+        
+        footer.addView(footerLine, footerLineParams)
+        footer.addView(self.creditLabel)
+        
+        # The forecast layout
         self.forecastLayout = LinearLayout(context)
         self.forecastLayout.setOrientation(LinearLayout.VERTICAL)
         self.scrollView.addView(self.forecastLayout)
         
-        placeParams = RelativeLayout.LayoutParams(
+        # Layout parameters
+        headerParams = RelativeLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT)
-        placeParams.addRule(RelativeLayout.ALIGN_PARENT_TOP)
-        placeParams.addRule(RelativeLayout.CENTER_HORIZONTAL)
+        headerParams.addRule(RelativeLayout.ALIGN_PARENT_TOP)
+        headerParams.addRule(RelativeLayout.CENTER_HORIZONTAL)
         
         scrollParams = RelativeLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT)
-        scrollParams.addRule(RelativeLayout.BELOW, 1)
-        scrollParams.addRule(RelativeLayout.ABOVE, 2)
         scrollParams.addRule(RelativeLayout.CENTER_HORIZONTAL)
+        scrollParams.addRule(RelativeLayout.BELOW, 1)
+        scrollParams.addRule(RelativeLayout.ABOVE, 3)
         
-        creditParams = RelativeLayout.LayoutParams(
+        footerParams = RelativeLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT)
-        creditParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
+        footerParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
         
-        self.addView(self.placeLabel, placeParams)
+        self.addView(header, headerParams)
         self.addView(self.scrollView, scrollParams)
-        self.addView(self.creditLabel, creditParams)
+        self.addView(footer, footerParams)
     
     @args(void, [List(Forecast)])
     def addForecasts(self, forecasts):
