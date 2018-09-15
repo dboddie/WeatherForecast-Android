@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import codecs, os, sys
 
-from Tools import buildhelper
+from DUCK.Tools import buildhelper
 
 def read_places():
 
