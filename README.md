@@ -30,7 +30,10 @@ The application is written in the Serpentine language which requires the
 [DUCK](http://www.boddie.org.uk/david/Projects/Python/DUCK/README.html)
 software to be installed or on the `PYTHONPATH`. Additionally, you will need
 to have created a key and signing certificate in order to create an installable
-package.
+package unless you are using a separate signing process.
+
+The current version of this application (1.0.0) has been tested to build with
+DUCK version 1.0.0.
 
 The `build.py` script supplied with the application can then be run in the
 following way, where `<key.pem>` and `<cert.pem>` are the locations of your
@@ -41,6 +44,13 @@ key and certificate files:
 ```
 
 You can then install the package on your Android device in the usual way.
+
+Alternatively, if you are using a separate signing process, you can build the
+package without signing it in the following way:
+
+```\
+./build.py WeatherForecast.apk
+```
 
 About the yr.no service and data
 --------------------------------

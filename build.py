@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import codecs, os, sys
 
+import DUCK
 from DUCK.Tools import buildhelper
 
 def read_places():
@@ -163,6 +164,9 @@ res_files = {
         },
     "raw": {
         "sample": "tests/oslo.xml"
+        },
+    "string": {
+        "version": "1.0.0"
         },
     "values": {
         "symbols": symbols,
