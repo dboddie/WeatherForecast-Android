@@ -60,7 +60,7 @@ def read_places():
 
 app_name = "Weather Forecast"
 package_name = "uk.org.boddie.android.weatherforecast"
-version = "1.0.1"
+version = "1.0.2"
 
 symbols = [
     "1d", "1m", "1n", "2d", "2m", "2n", "3d", "3m", "3n",
@@ -186,7 +186,11 @@ features = []
 permissions = ["android.permission.INTERNET",
                "android.permission.READ_EXTERNAL_STORAGE",
                "android.permission.WRITE_EXTERNAL_STORAGE"]
-options = {"pngquant": "-f 32"}
+
+# General customisation options, though these specific ones are related to icon
+# generation. Enable the icon cache for faster package creation when developing.
+options = {"pngquant": "-f 32",
+           "icon cache": False}
 
 if __name__ == "__main__":
 
