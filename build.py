@@ -60,6 +60,8 @@ def read_places():
 
 app_name = "Weather Forecast"
 package_name = "uk.org.boddie.android.weatherforecast"
+version = "1.0.1"
+
 symbols = [
     "1d", "1m", "1n", "2d", "2m", "2n", "3d", "3m", "3n",
     "4", "5d", "5m", "5n", "6d", "6m", "6n", "7d", "7m",
@@ -165,9 +167,6 @@ res_files = {
     "raw": {
         "sample": "tests/oslo.xml"
         },
-    "string": {
-        "version": "1.0.0"
-        },
     "values": {
         "symbols": symbols,
         "place_names": place_names,
@@ -195,6 +194,6 @@ if __name__ == "__main__":
     
     result = buildhelper.main(__file__, app_name, package_name, res_files,
         layout, code_file, include_paths, features, permissions, args,
-        include_sources = False, options = options)
+        include_sources = False, options = options, version = version)
     
     sys.exit(result)
