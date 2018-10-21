@@ -32,8 +32,8 @@ software to be installed or on the `PYTHONPATH`. Additionally, you will need
 to have created a key and signing certificate in order to create an installable
 package unless you are using a separate signing process.
 
-The current version of this application (1.0.0) has been tested to build with
-DUCK version 1.0.0.
+The current version of this application (1.0.4) has been tested to build with
+DUCK version 1.0.3.
 
 The `build.py` script supplied with the application can then be run in the
 following way, where `<key.pem>` and `<cert.pem>` are the locations of your

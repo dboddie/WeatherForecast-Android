@@ -60,7 +60,7 @@ def read_places():
 
 app_name = "Weather Forecast"
 package_name = "uk.org.boddie.android.weatherforecast"
-version = "1.0.2"
+version = "1.0.4"
 
 symbols = [
     "1d", "1m", "1n", "2d", "2m", "2n", "3d", "3m", "3n",
