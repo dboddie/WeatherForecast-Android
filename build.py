@@ -79,7 +79,7 @@ place_names, places = read_places()
 
 res_files = {
     "drawable": {
-        "ic_launcher": "images/svg/27d.svg",
+        "ic_launcher": "images/svg/ic_launcher.svg",
         "s01d": "images/png/01d.png",
         "s01m": "images/png/01m.png",
         "s01n": "images/png/01n.png",
