@@ -187,3 +187,4 @@ class CacheItem(Object):
         
         self.time = time
         self.forecasts = forecasts
+
