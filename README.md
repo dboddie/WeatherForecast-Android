@@ -6,7 +6,7 @@ service.
 
 ![A screenshot of the application](docs/screenshot.png)
 
-[![Get it on F-Droid](https://f-droid.org/badge/get-it-on.png)](https://www.f-droid.org/en/packages/uk.org.boddie.android.weatherforecast/)
+[<img src="https://f-droid.org/badge/get-it-on.png" height="75">](https://www.f-droid.org/en/packages/uk.org.boddie.android.weatherforecast/)
 [![Current package version](https://img.shields.io/f-droid/v/uk.org.boddie.android.weatherforecast.svg)](https://www.f-droid.org/en/packages/uk.org.boddie.android.weatherforecast/)
 
 Adding, removing and selecting locations
