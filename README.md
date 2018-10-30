@@ -4,10 +4,10 @@ Weather Forecast
 This application downloads and displays weather forecasts from the yr.no
 service.
 
-![A screenshot of the application](docs/screenshot.png)
-
-[<img src="https://f-droid.org/badge/get-it-on.png" height="75">](https://www.f-droid.org/en/packages/uk.org.boddie.android.weatherforecast/)
+It is available to install from the F-Droid catalogue:
 [![Current package version](https://img.shields.io/f-droid/v/uk.org.boddie.android.weatherforecast.svg)](https://www.f-droid.org/en/packages/uk.org.boddie.android.weatherforecast/)
+
+![A screenshot of the application](docs/screenshot.png)
 
 Adding, removing and selecting locations
 ----------------------------------------
